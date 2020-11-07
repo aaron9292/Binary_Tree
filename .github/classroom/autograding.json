@@ -1,0 +1,44 @@
+{
+  "tests": [
+    {
+      "name": "Insertions",
+      "setup": "",
+      "run": "make test1",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Searches",
+      "setup": "",
+      "run": "make test2",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Removals",
+      "setup": "",
+      "run": "make test3",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 15
+    },
+    {
+      "name": "Rebalancing",
+      "setup": "",
+      "run": "make test4",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 15
+    }
+  ]
+}
