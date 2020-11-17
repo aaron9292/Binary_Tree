@@ -131,10 +131,16 @@ TreeNode<T>* BinarySearchTree<T>::find(T value){
                 }else if(current->getRightChild()->getValue() == value){
                     return current->getRightChild();
                 }else{
-                    if(value < current->getValue()){
-                        current = current->getLeftChild();
+                    if(current->getLeftChild() != nullptr){
+                        if(value < current->getValue()){
+                            current = current->getLeftChild();
+                        }
                     }else{
-                        current = current->getRightChild();
+                        if(current->getRightChild() != nullptr){
+                            if(value > current->getValue()){
+                                current = current->getRightChild();
+                            }
+                        }
                     }
                 }
             }
@@ -146,8 +152,7 @@ TreeNode<T>* BinarySearchTree<T>::find(T value){
 
 template<typename T>
 TreeNode<T>* BinarySearchTree<T>::remove(T value){
-    TreeNode<T>* current = root;
-    current = find(value);
+    TreeNode<T>* current = find(value);
 
     return current;
 }
