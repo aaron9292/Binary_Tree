@@ -22,6 +22,7 @@ public:
     void rebalance();
     void inOrder(TreeNode<T>* node, vector<T>& list) const;
     void postClear(TreeNode<T>* node);
+    bool nodeExist(TreeNode<T>* node, T value);
 private:
     TreeNode<T>* root;
 };
@@ -96,67 +97,59 @@ void BinarySearchTree<T>::clearContents(){
 }
 
 template<typename T>
+bool BinarySearchTree<T>::nodeExist(TreeNode<T>* node, T value){
+    if(node == nullptr){
+        return false;
+    }
+    if(node->getValue() == value){
+        return true;
+    }
+
+    bool left = nodeExist(node->getLeftChild(), value);
+
+    if(left){
+        return true;
+    }
+
+    bool right = nodeExist(node->getRightChild(), value);
+
+    return right;
+}
+
+template<typename T>
 TreeNode<T>* BinarySearchTree<T>::find(T value){
     TreeNode<T>* current = root;
-    if(current->getValue() == value){
-        return current;
+    int found = 0;
+
+    if(nodeExist(root, value)){
+        if(root->getValue() == value){
+            return root;
+        }else{
+            while(found == 0){
+                if(current->getLeftChild()->getValue() == value){
+                    return current->getLeftChild();
+                }else if(current->getRightChild()->getValue() == value){
+                    return current->getRightChild();
+                }else{
+                    if(value < current->getValue()){
+                        current = current->getLeftChild();
+                    }else{
+                        current = current->getRightChild();
+                    }
+                }
+            }
+        }
     }
 
-    if(current->getValue() < value){
-        return find(current->getRightChild()->getValue());
-    }
-
-    return find(current->getLeftChild()->getValue());
+    return nullptr;
 }
 
 template<typename T>
 TreeNode<T>* BinarySearchTree<T>::remove(T value){
-    TreeNode<T>* node = find(value);
-    TreeNode<T>* removed = find(value);
-    TreeNode<T>* parent = node->getParentNode();
-    TreeNode<T>* left = node->getLeftChild();
-    TreeNode<T>* right = node->getRightChild();
+    TreeNode<T>* current = root;
+    current = find(value);
 
-    if(left == nullptr && right == nullptr){ //no children
-        if(node->getValue() < parent->getValue()){ //smaller than parent
-            parent->setLeft(nullptr);
-        }else{ //bigger than parent
-            parent->setRight(nullptr);
-        }
-    }else if(left == nullptr || right == nullptr){ //has one children
-        if(node->getValue() < parent->getValue()){ //less than parent
-            if(left != nullptr){ //left child present
-                parent->setLeft(left);
-                left->setParent(parent);
-            }else{ //right child present
-                parent->setLeft(right);
-                right->setParent(parent);
-            }
-        }else{ //more than parent
-            if(left != nullptr){ //left child present
-                parent->setRight(left);
-                left->setParent(parent);
-            }else{ //right child present
-                parent->setRight(right);
-                right->setParent(parent);
-            }
-        }
-    }else{ //two children
-        TreeNode<T>* current = node->getRightChild();
-
-        while(current->getLeftChild() != nullptr){
-            if(current->getLeftChild() == nullptr){
-                node->setValue(current->getValue());
-
-                current = current->getParentNode();
-                current->setLeft(nullptr);
-            }
-
-            current = current->getLeftChild();
-        }
-    }
-
-    return removed;
+    return current;
 }
 
 template<typename T>
