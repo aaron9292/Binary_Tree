@@ -243,7 +243,7 @@ void testRebalance() {
 }
 
 int main(int argc, char** argv) {
-    /*int testToRun = 99;
+    int testToRun = 99;
     if ( argc > 1) {
         testToRun = atoi(argv[1]);
     }
@@ -267,9 +267,5 @@ int main(int argc, char** argv) {
             testRemovals();
             testRebalance();
             break;
-    }*/
-    testInsertions();
-    testSearches();
-    testRemovals();
-    testRebalance();
+    }
 }
