@@ -23,7 +23,7 @@ public:
     void inOrder(TreeNode<T>* node, vector<T> &list) const;
     void postClear(TreeNode<T>* node);
     bool nodeExist(TreeNode<T>* node, T value);
-    TreeNode<T>* vecToTree(vector<T> list, int start, int end);
+    TreeNode<T>* vecToTree(vector<T> list, int start, int end, int times);
 private:
     TreeNode<T>* root;
 };
@@ -248,22 +248,26 @@ void BinarySearchTree<T>::rebalance(){
         values.push_back(list.at(i));
     }
 
-    int size = values.size();
-
-    root = vecToTree(values, 0, size - 1);
+    root = vecToTree(values, 0, values.size() - 1, 0);
 }
 
 template<typename T>
-TreeNode<T>* BinarySearchTree<T>::vecToTree(vector<T> list, int start, int end){
+TreeNode<T>* BinarySearchTree<T>::vecToTree(vector<T> list, int start, int end, int times){
     if(start > end){
         return nullptr;
     }
 
-    int mid = (start + end + 1) / 2;
+    int mid = 0;
+
+    if(times == 0){
+        mid = list.size() / 2;
+    }else{
+        mid = (start + end) / 2;
+    }
     TreeNode<T>* node = new TreeNode<T>(list.at(mid));
 
-    root->setLeft(vecToTree(list, start, mid - 1));
-    root->setRight(vecToTree(list, mid + 1, end));
+    node->setLeft(vecToTree(list, start, mid - 1, times + 1));
+    node->setRight(vecToTree(list, mid + 1, end, times + 1));
 
     return node;
 }
