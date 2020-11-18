@@ -23,6 +23,7 @@ public:
     void inOrder(TreeNode<T>* node, vector<T>& list) const;
     void postClear(TreeNode<T>* node);
     bool nodeExist(TreeNode<T>* node, T value);
+    TreeNode<T>* vecToTree(vector<T> list, int start, int end);
 private:
     TreeNode<T>* root;
 };
@@ -126,18 +127,18 @@ TreeNode<T>* BinarySearchTree<T>::find(T value){
             return root;
         }else{
             while(found == 0){
-                if(current->getLeftChild()->getValue() == value){
+                if(current->getLeftChild() != nullptr && current->getLeftChild()->getValue() == value){
                     return current->getLeftChild();
-                }else if(current->getRightChild()->getValue() == value){
+                }else if(current->getRightChild() != nullptr && current->getRightChild()->getValue() == value){
                     return current->getRightChild();
                 }else{
-                    if(current->getLeftChild() != nullptr){
-                        if(value < current->getValue()){
+                    if(value < current->getValue()){
+                        if(current->getLeftChild() != nullptr){
                             current = current->getLeftChild();
                         }
                     }else{
-                        if(current->getRightChild() != nullptr){
-                            if(value > current->getValue()){
+                        if(value > current->getValue()){
+                            if(current->getRightChild() != nullptr){
                                 current = current->getRightChild();
                             }
                         }
@@ -153,8 +154,83 @@ TreeNode<T>* BinarySearchTree<T>::find(T value){
 template<typename T>
 TreeNode<T>* BinarySearchTree<T>::remove(T value){
     TreeNode<T>* current = find(value);
+    TreeNode<T>* removed = find(value); //removed node
+    TreeNode<T>* left = current->getLeftChild();
+    TreeNode<T>* right = current->getRightChild();
+    TreeNode<T>* parent = current->getParentNode();
 
-    return current;
+    if(right == nullptr && left == nullptr){ //no child
+        if(value < parent->getValue()){
+            parent->setLeft(nullptr);
+            removed->setParent(nullptr);
+        }else{
+            parent->setRight(nullptr);
+            removed->setParent(nullptr);
+        }
+    }else if(right != nullptr && left == nullptr){ //one child right child present
+        if(value < parent->getValue()){ //left of parent
+            parent->setLeft(right);
+            right->setParent(parent);
+
+            removed->setRight(nullptr);
+            removed->setParent(nullptr);
+        }else{
+            parent->setRight(right);
+            right->setParent(parent);
+
+            removed->setRight(nullptr);
+            removed->setParent(nullptr);
+        }
+    }else if(right == nullptr && left != nullptr){ //one child left child present
+        if(value < parent->getValue()){ //left of parent
+            parent->setLeft(left);
+            left->setParent(parent);
+
+            removed->setLeft(nullptr);
+            removed->setParent(nullptr);
+        }else{
+            parent->setRight(left);
+            left->setParent(parent);
+
+            removed->setRight(nullptr);
+            removed->setParent(nullptr);
+        }
+    }else{ //two children
+        current = right;
+
+        while(current->getLeftChild() != nullptr){ //next largest element
+            current = current->getLeftChild();
+        }
+
+        TreeNode<T>* replace = remove(current->getValue());
+
+        right = removed->getRightChild();
+
+        replace->setRight(right);
+        replace->setLeft(left);
+        replace->setParent(parent);
+
+        if(right != nullptr){
+            right->setParent(replace);
+        }
+        left->setParent(replace);
+
+        removed->setLeft(nullptr);
+        removed->setRight(nullptr);
+        removed->setParent(nullptr);
+
+        if(root->getValue() == value){
+            root = replace;
+        }else{
+            if(value < parent->getValue()){
+                parent->setLeft(replace);
+            }else{
+                parent->setRight(replace);
+            }
+        }
+    }
+
+    return removed;
 }
 
 template<typename T>
@@ -164,7 +240,34 @@ TreeNode<T>* BinarySearchTree<T>::getRoot(){
 
 template<typename T>
 void BinarySearchTree<T>::rebalance(){
+    vector<T> list;
 
+    for(int i = 0; i < list.size(); i++){
+        list.pop_back();
+    }
+
+    inOrder(root, list);
+
+    for(int i = 0; i < list.size(); i++){
+        cout << list.at(i) << " ";
+    }
+
+    root = vecToTree(list, 0, list.size() - 1);
+}
+
+template<typename T>
+TreeNode<T>* BinarySearchTree<T>::vecToTree(vector<T> list, int start, int end){
+    if(start > end){
+        return nullptr;
+    }
+
+    int mid = (start + end) / 2;
+    TreeNode<T>* newRoot = new TreeNode<T>(list.at(mid));
+
+    root->setLeft(vecToTree(list, start, mid - 1));
+    root->setRight(vecToTree(list, mid + 1, end));
+
+    return newRoot;
 }
 
 #endif //BSTBASE_BINARYSEARCHTREE_H

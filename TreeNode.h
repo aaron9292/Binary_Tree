@@ -20,7 +20,6 @@ public:
     void setLeft(TreeNode<T>* point);
     void setRight(TreeNode<T>* point);
     void setParent(TreeNode<T>* point);
-    void setValue(T amount);
 private:
     T value;
     TreeNode<T>* left;
@@ -49,11 +48,6 @@ void TreeNode<T>::setRight(TreeNode<T> *point){
 template<typename T>
 void TreeNode<T>::setParent(TreeNode<T> *point){
     parent = point;
-}
-
-template<typename T>
-void TreeNode<T>::setValue(T amount){
-    value = amount;
 }
 
 template<typename T>
