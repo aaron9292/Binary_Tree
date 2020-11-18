@@ -13,13 +13,16 @@ template<typename T>
 class BinarySearchTree{
 public:
     BinarySearchTree(TreeNode<T>* r);
-    void traverse(vector<T> &list) const;
+
     void addNode(TreeNode<T>* node);
-    void clearContents();
-    TreeNode<T>* find(T value);
     TreeNode<T>* remove(T value);
+    TreeNode<T>* find(T value);
     TreeNode<T>* getRoot();
+
+    void traverse(vector<T> &list) const;
+    void clearContents();
     void rebalance();
+
     void inOrder(TreeNode<T>* node, vector<T> &list) const;
     void postClear(TreeNode<T>* node);
     bool nodeExist(TreeNode<T>* node, T value);
@@ -34,7 +37,7 @@ BinarySearchTree<T>::BinarySearchTree(TreeNode<T>* r){
 }
 
 template<typename T>
-void BinarySearchTree<T>::inOrder(TreeNode<T>* node, vector<T> &list) const{
+void BinarySearchTree<T>::inOrder(TreeNode<T>* node, vector<T> &list) const{ //adds all values of tree in ascending order onto vector
     if(node != nullptr){
         inOrder(node->getLeftChild(), list);
         list.push_back(node->getValue());
@@ -44,22 +47,17 @@ void BinarySearchTree<T>::inOrder(TreeNode<T>* node, vector<T> &list) const{
 
 template<typename T>
 void BinarySearchTree<T>::traverse(vector<T> &list) const{
-    vector<T> order;
-    inOrder(root, order);
-
-    for(int i = 0; i < order.size(); i++){
-        list.push_back(order.at(i));
-    }
+    inOrder(root, list);
 }
 
 template<typename T>
-void BinarySearchTree<T>::addNode(TreeNode<T>* node){
+void BinarySearchTree<T>::addNode(TreeNode<T>* node){ //add nodes in tree
     int value = node->getValue();
     TreeNode<T>* current = root;
     int found = 0;
 
     while(found == 0){
-        if(value < current->getValue()){ //less than current
+        if(value < current->getValue()){
             if(current->getLeftChild() == nullptr){
                 current->setLeft(node);
                 node->setParent(current);
@@ -67,7 +65,7 @@ void BinarySearchTree<T>::addNode(TreeNode<T>* node){
             }else{
                 current = current->getLeftChild();
             }
-        }else{ //more than current
+        }else{
             if(current->getRightChild() == nullptr){
                 current->setRight(node);
                 node->setParent(current);
@@ -80,10 +78,11 @@ void BinarySearchTree<T>::addNode(TreeNode<T>* node){
 }
 
 template<typename T>
-void BinarySearchTree<T>::postClear(TreeNode<T>* node){
+void BinarySearchTree<T>::postClear(TreeNode<T>* node){ //change all nodes to nullptr
     if(node == nullptr){
         return;
     }
+
     postClear(node->getLeftChild());
     postClear(node->getRightChild());
 
@@ -98,27 +97,26 @@ void BinarySearchTree<T>::clearContents(){
 }
 
 template<typename T>
-bool BinarySearchTree<T>::nodeExist(TreeNode<T>* node, T value){
+bool BinarySearchTree<T>::nodeExist(TreeNode<T>* node, T value){ //check if node exists with same value in tree
     if(node == nullptr){
         return false;
     }
+
     if(node->getValue() == value){
         return true;
     }
-
     bool left = nodeExist(node->getLeftChild(), value);
 
     if(left){
         return true;
     }
-
     bool right = nodeExist(node->getRightChild(), value);
 
     return right;
 }
 
 template<typename T>
-TreeNode<T>* BinarySearchTree<T>::find(T value){
+TreeNode<T>* BinarySearchTree<T>::find(T value){ //returns node with same value
     TreeNode<T>* current = root;
     int found = 0;
 
@@ -152,14 +150,14 @@ TreeNode<T>* BinarySearchTree<T>::find(T value){
 }
 
 template<typename T>
-TreeNode<T>* BinarySearchTree<T>::remove(T value){
+TreeNode<T>* BinarySearchTree<T>::remove(T value){ //remove nodes with same value from tree
     TreeNode<T>* current = find(value);
-    TreeNode<T>* removed = find(value); //removed node
+    TreeNode<T>* removed = find(value);
     TreeNode<T>* left = current->getLeftChild();
     TreeNode<T>* right = current->getRightChild();
     TreeNode<T>* parent = current->getParentNode();
 
-    if(right == nullptr && left == nullptr){ //no child
+    if(right == nullptr && left == nullptr){
         if(value < parent->getValue()){
             parent->setLeft(nullptr);
             removed->setParent(nullptr);
@@ -167,8 +165,8 @@ TreeNode<T>* BinarySearchTree<T>::remove(T value){
             parent->setRight(nullptr);
             removed->setParent(nullptr);
         }
-    }else if(right != nullptr && left == nullptr){ //one child right child present
-        if(value < parent->getValue()){ //left of parent
+    }else if(right != nullptr && left == nullptr){
+        if(value < parent->getValue()){
             parent->setLeft(right);
             right->setParent(parent);
 
@@ -181,8 +179,8 @@ TreeNode<T>* BinarySearchTree<T>::remove(T value){
             removed->setRight(nullptr);
             removed->setParent(nullptr);
         }
-    }else if(right == nullptr && left != nullptr){ //one child left child present
-        if(value < parent->getValue()){ //left of parent
+    }else if(right == nullptr && left != nullptr){
+        if(value < parent->getValue()){
             parent->setLeft(left);
             left->setParent(parent);
 
@@ -195,10 +193,10 @@ TreeNode<T>* BinarySearchTree<T>::remove(T value){
             removed->setRight(nullptr);
             removed->setParent(nullptr);
         }
-    }else{ //two children
+    }else{
         current = right;
 
-        while(current->getLeftChild() != nullptr){ //next largest element
+        while(current->getLeftChild() != nullptr){
             current = current->getLeftChild();
         }
 
@@ -239,20 +237,15 @@ TreeNode<T>* BinarySearchTree<T>::getRoot(){
 }
 
 template<typename T>
-void BinarySearchTree<T>::rebalance(){
+void BinarySearchTree<T>::rebalance(){ //rebalances tree from vecToTree method
     vector<T> list;
-    vector<T> values;
     inOrder(root, list);
 
-    for(int i = 0; i < list.size(); i++){
-        values.push_back(list.at(i));
-    }
-
-    root = vecToTree(values, 0, values.size() - 1, 0);
+    root = vecToTree(list, 0, list.size() - 1, 0);
 }
 
 template<typename T>
-TreeNode<T>* BinarySearchTree<T>::vecToTree(vector<T> list, int start, int end, int times){
+TreeNode<T>* BinarySearchTree<T>::vecToTree(vector<T> list, int start, int end, int times){ //converts vector of values to balanced tree
     if(start > end){
         return nullptr;
     }
@@ -264,6 +257,7 @@ TreeNode<T>* BinarySearchTree<T>::vecToTree(vector<T> list, int start, int end, 
     }else{
         mid = (start + end) / 2;
     }
+
     TreeNode<T>* node = new TreeNode<T>(list.at(mid));
 
     node->setLeft(vecToTree(list, start, mid - 1, times + 1));
